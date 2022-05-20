@@ -79,9 +79,9 @@ pub struct ArgumentParser {
 }
 
 impl ArgumentParser {
-    pub fn new(description: Option<String>) -> ArgumentParser {
+    pub fn new(description: Option<&str>) -> ArgumentParser {
         let description = match description {
-            Some(d) => d,
+            Some(d) => d.to_string(),
             None => String::new(),
         };
 
