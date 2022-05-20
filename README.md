@@ -17,3 +17,7 @@ sargparse = "0.0.1"
 ## Documentation
 
 Refer to the <a href="https://github.com/frankhart2018/sargparse/blob/master/docs.md">documentation markdown</a> to get started.
+
+## License
+
+SArgparse is licensed under the <a href="https://github.com/frankhart2018/sargparse/blob/master/LICENSE">MIT license</a>.
