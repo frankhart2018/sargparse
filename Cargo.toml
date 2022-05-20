@@ -6,7 +6,11 @@ author = "Siddhartha Dhar Choudhury"
 description = "A sane argument parsing library for Rust"
 documentation = "https://github.com/frankhart2018/sargparse/blob/master/docs.md"
 readme = "https://github.com/frankhart2018/sargparse/blob/master/README.md"
+homepage = "https://github.com/frankhart2018/sargparse/"
 repository = "https://github.com/frankhart2018/sargparse/"
+license = "MIT"
+license-file = "LICENSE"
+keywords = ["argument parsing, argparse, python"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
