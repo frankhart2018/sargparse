@@ -30,3 +30,21 @@ Ok that was a lot of arguments, let break this up:
     b. `ArgumentType::FLOAT`: parses the value as a float.
     c. `ArgumentType::STR`: parses the value as a string.
     d. `ArgumentType::BOOL`: parses the value as a boolean.
+
+3. Parse your arguments, get your values using the `parse_args()` method:
+
+```rust
+let args = parser.parse_args();
+```
+
+This parser values from `std::env::args()` which is the standard way of reading values from command line in Rust.
+
+Once you have the args parsed, you can access them using Rust's `get()` method for HashMap because `parse_args()` returns a HashMap with the key as the `long_name` and the value as the parsed_value:
+
+```rust
+let file = args.get("file").unwrap().get_str();
+```
+
+Ok, I cheated a bit here, what's with the `get_str()` here, well Rust is a typed language and needs the type of arguments, and I don't want you to use the internal data enum type as your variable types, so you can convert it to your required type using one of `get_int()`, `get_float()`, `get_str()` or `get_bool()` methods depending on the type of the argument.
+
+That's it, you're done! Wasn't this easy? 
