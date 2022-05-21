@@ -29,7 +29,7 @@ Ok that was a lot of arguments, let break this up:
     a. `ArgumentType::INT`: parses the value as an integer.
     b. `ArgumentType::FLOAT`: parses the value as a float.
     c. `ArgumentType::STR`: parses the value as a string.
-    d. `ArgumentType::BOOL`: parses the value as a boolean.
+    d. `ArgumentType::BOOL`: parses the value as a boolean. Arguments of these types are simply flags and do not take any values.
 
 Arguments can also be positional, positional arguments have to appear in the order in which they were added otherwise it will result in an error. To add a positional argument, simply remove the - before the short name and -- before the long name:
 
@@ -56,3 +56,57 @@ let file = args.get("file").unwrap().get_str();
 Ok, I cheated a bit here, what's with the `get_str()` here, well Rust is a typed language and needs the type of arguments, and I don't want you to use the internal data enum type as your variable types, so you can convert it to your required type using one of `get_int()`, `get_float()`, `get_str()` or `get_bool()` methods depending on the type of the argument.
 
 That's it, you're done! Wasn't this easy? 
+
+# Example
+
+Here's a complete example of how to use this parser:
+
+1. Add `sargparse` as a dependency:
+
+```toml
+[dependencies]
+sargparse = "0.1"
+```
+
+2. The actual program:
+
+```rust
+extern crate sargparse;
+
+use sargparse::{ArgumentParser, ArgumentType, InnerData};
+
+fn main() {
+    let mut parser = ArgumentParser::new(Some("Awesome program"));
+
+    parser.add_argument("f", "file", "File input for awesome program", 
+                        true, None, ArgumentType::STR);
+    parser.add_argument("-i", "--input", "Input string for awesome program", 
+                        true, None, ArgumentType::STR);
+    parser.add_argument("-n", "--number", "Input int for awesome program", 
+                        false, Some(InnerData::INT(2)), ArgumentType::INT);
+    parser.add_argument("-f", "--float", "Input float for awesome program", 
+                        false, Some(InnerData::FLOAT(3.14)), ArgumentType::FLOAT);
+    parser.add_argument("-b", "--bool", "Input bool for awesome program", 
+                        false, Some(InnerData::BOOL(false)), ArgumentType::BOOL);
+
+    let args = parser.parse_args().unwrap();
+
+    let file = args.get("file").unwrap().get_str();
+    let input = args.get("input").unwrap().get_str();
+    let number = args.get("number").unwrap().get_int();
+    let float = args.get("float").unwrap().get_float();
+    let bool = args.get("bool").unwrap().get_bool();
+
+    assert_eq!(file, "sample.txt");
+    assert_eq!(input, "sample");
+    assert_eq!(number, 25);
+    assert_eq!(float, 44.56);
+    assert_eq!(bool, true);
+}
+```
+
+If running using `cargo run`, this can be run using:
+
+```bash
+cargo run -- sample.txt -i sample -n 25 -f 44.56 --bool
+```
