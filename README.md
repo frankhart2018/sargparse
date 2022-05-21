@@ -11,7 +11,7 @@ I know there are similar libraries that do the same thing, but I felt that their
 This crate is published to <a href="https://crates.io/">crates.io</a>, and can be added to your project by simply adding this line to you `Cargo.toml` file:
 
 ```
-sargparse = "0.0.1"
+sargparse = "0.0.2"
 ```
 
 ## Documentation

@@ -68,6 +68,7 @@ struct Argument {
     long_name: String,
     help: String,
     default: Option<InnerData>,
+    required: bool,
     dtype: ArgumentType,
 }
 
@@ -76,6 +77,7 @@ pub struct ArgumentParser {
     description: String,
     required_args: Vec<Argument>,
     optional_args: Vec<Argument>,
+    ordered_args: Vec<Argument>,
 }
 
 impl ArgumentParser {
@@ -89,6 +91,7 @@ impl ArgumentParser {
             description,
             required_args: Vec::new(),
             optional_args: Vec::new(),
+            ordered_args: Vec::new(),
         }
     }
 
@@ -99,8 +102,14 @@ impl ArgumentParser {
             long_name: long_name.to_string(),
             help: help.to_string(),
             default: default,
+            required: required,
             dtype: dtype,
         };
+
+        if !short_name.starts_with("-") && !long_name.starts_with("--") {
+            self.ordered_args.push(argument);
+            return;
+        }
 
         if required {
             self.required_args.push(argument);
@@ -110,7 +119,8 @@ impl ArgumentParser {
     }
 
     fn push_parsed_args(&self, arg: &Argument, intermediate_parsed_args: &HashMap<String, String>,
-                        parsed_args: &mut HashMap<String, InnerData>, search_param: &str) {
+                        parsed_args: &mut HashMap<String, InnerData>, search_param: &str,
+                        key: &String) {
         match arg.dtype {
             ArgumentType::INT => {
                 let value = intermediate_parsed_args.get(search_param);
@@ -118,16 +128,20 @@ impl ArgumentParser {
                 match value {
                     Some(v) => {
                         let v = v.parse::<i32>().unwrap();
-                        parsed_args.insert(arg.long_name.clone(), InnerData::from_int(v));
+                        parsed_args.insert(key.clone(), InnerData::from_int(v));
                     },
                     None => {
                         match &arg.default {
                             Some(d) => {
                                 let d = d.get_int();
-                                parsed_args.insert(arg.long_name.clone(), InnerData::from_int(d));
+                                parsed_args.insert(key.clone(), InnerData::from_int(d));
                             },
                             None => {
-                                panic!("Missing required argument: {}", arg.long_name);
+                                if arg.required {
+                                    panic!("Missing required argument: {}", arg.long_name);
+                                } else {
+                                    parsed_args.insert(key.clone(), InnerData::from_int(0));
+                                }
                             },
                         }
                     },
@@ -139,16 +153,20 @@ impl ArgumentParser {
                 match value {
                     Some(v) => {
                         let v = v.parse::<f32>().unwrap();
-                        parsed_args.insert(arg.long_name.clone(), InnerData::from_float(v));
+                        parsed_args.insert(key.clone(), InnerData::from_float(v));
                     },
                     None => {
                         match &arg.default {
                             Some(d) => {
                                 let d = d.get_float();
-                                parsed_args.insert(arg.long_name.clone(), InnerData::from_float(d));
+                                parsed_args.insert(key.clone(), InnerData::from_float(d));
                             },
                             None => {
-                                panic!("Missing required argument: {}", arg.long_name);
+                                if arg.required {
+                                    panic!("Missing required argument: {}", arg.long_name);
+                                } else {
+                                    parsed_args.insert(key.clone(), InnerData::from_float(0.0));
+                                }
                             },
                         }
                     },
@@ -160,16 +178,20 @@ impl ArgumentParser {
                 match value {
                     Some(v) => {
                         let v = v.clone();
-                        parsed_args.insert(arg.long_name.clone(), InnerData::from_str(v));
+                        parsed_args.insert(key.clone(), InnerData::from_str(v));
                     },
                     None => {
                         match &arg.default {
                             Some(d) => {
                                 let d = d.get_str();
-                                parsed_args.insert(arg.long_name.clone(), InnerData::from_str(d));
+                                parsed_args.insert(key.clone(), InnerData::from_str(d));
                             },
                             None => {
-                                panic!("Missing required argument: {}", arg.long_name);
+                                if arg.required {
+                                    panic!("Missing required argument: {}", arg.long_name);
+                                } else {
+                                    parsed_args.insert(key.clone(), InnerData::from_str(String::new()));
+                                }
                             },
                         }
                     },
@@ -181,16 +203,20 @@ impl ArgumentParser {
                 match value {
                     Some(v) => {
                         let v = v.parse::<bool>().unwrap();
-                        parsed_args.insert(arg.long_name.clone(), InnerData::from_bool(v));
+                        parsed_args.insert(key.clone(), InnerData::from_bool(v));
                     },
                     None => {
                         match &arg.default {
                             Some(d) => {
                                 let d = d.get_bool();
-                                parsed_args.insert(arg.long_name.clone(), InnerData::from_bool(d));
+                                parsed_args.insert(key.clone(), InnerData::from_bool(d));
                             },
                             None => {
-                                panic!("Missing required argument: {}", arg.long_name);
+                                if arg.required {
+                                    panic!("Missing required argument: {}", arg.long_name);
+                                } else {
+                                    parsed_args.insert(key.clone(), InnerData::from_bool(false));
+                                }
                             },
                         }
                     },
@@ -221,9 +247,20 @@ impl ArgumentParser {
         let mut intermediate_parsed_args: HashMap<String, String> = HashMap::new();
 
         let mut i = 1;
+        for j in 0..self.ordered_args.len() {
+            let arg = &self.ordered_args[j];
+            let value = &args[i];
+
+            i += 1;
+
+            intermediate_parsed_args.insert(arg.long_name.clone(), value.clone());
+            self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, 
+                                  &arg.long_name.clone(), &arg.long_name);
+        }
+
         while i < args.len() {
             if i < args.len() && args[i].starts_with("-") || args[i].starts_with("--") {
-                let arg_option = args[i].clone().replace("-", "");
+                let arg_option = args[i].clone();
                 i += 1;
 
                 if i < args.len() && (args[i].starts_with("-") || args[i].starts_with("--")) {
@@ -251,9 +288,11 @@ impl ArgumentParser {
 
         for arg in self.required_args.iter() {
             if intermediate_parsed_args.contains_key(&arg.short_name) {
-                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, &arg.short_name);
+                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, 
+                                      &arg.short_name, &arg.long_name.replace("-", ""));
             } else if intermediate_parsed_args.contains_key(&arg.long_name) {
-                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, &arg.long_name);
+                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, 
+                    &arg.long_name, &arg.long_name.replace("-", ""));
             } else {
                 panic!("Missing required argument: {}", arg.short_name);
             }
@@ -261,9 +300,14 @@ impl ArgumentParser {
 
         for arg in self.optional_args.iter() {
             if intermediate_parsed_args.contains_key(&arg.short_name) {
-                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, &arg.short_name);
+                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, 
+                    &arg.short_name, &arg.long_name.replace("-", ""));
             } else if intermediate_parsed_args.contains_key(&arg.long_name) {
-                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, &arg.long_name);
+                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, 
+                    &arg.long_name, &arg.long_name.replace("-", ""));
+            } else {
+                self.push_parsed_args(arg, &intermediate_parsed_args, &mut parsed_args, 
+                    "", &arg.long_name.replace("-", ""));
             }
         }
 
