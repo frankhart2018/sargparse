@@ -1,6 +1,6 @@
 [package]
 name = "sargparse"
-version = "0.0.2"
+version = "0.2.0"
 edition = "2021"
 author = "Siddhartha Dhar Choudhury"
 description = "A sane argument parsing library for Rust"
