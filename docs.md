@@ -111,7 +111,7 @@ If running using `cargo run`, this can be run using:
 cargo run -- sample.txt -i sample -n 25 -f 44.56 --bool
 ```
 
-If you are running the binary then:
+If you are running the binary then forget the -- at the beginning:
 
 ```bash
 ./awesome-program sample.txt -i sample -n 25 -f 44.56 --bool
