@@ -57,6 +57,12 @@ Ok, I cheated a bit here, what's with the `get_str()` here, well Rust is a typed
 
 That's it, you're done! Wasn't this easy? 
 
+To get help for an argument simply use `-h` or `--help` as the argument:
+
+```bash
+./awesome-program -h
+```
+
 # Example
 
 Here's a complete example of how to use this parser:
@@ -65,7 +71,7 @@ Here's a complete example of how to use this parser:
 
 ```toml
 [dependencies]
-sargparse = "0.1"
+sargparse = "~0.2.2"
 ```
 
 2. The actual program:
