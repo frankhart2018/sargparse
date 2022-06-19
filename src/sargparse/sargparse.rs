@@ -281,7 +281,7 @@ impl ArgumentParser {
             }
         }
 
-        if intermediate_parsed_args.contains_key("h") || intermediate_parsed_args.contains_key("help") {
+        if intermediate_parsed_args.contains_key("-h") || intermediate_parsed_args.contains_key("--help") {
             self.help();
             return None;
         }
