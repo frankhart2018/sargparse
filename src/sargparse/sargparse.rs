@@ -231,12 +231,12 @@ impl ArgumentParser {
         println!("\n");
         println!("Required arguments:");
         for arg in &self.required_args {
-            println!("\t--{} (-{}, {:?}): {}", arg.long_name, arg.short_name, arg.dtype, arg.help);
+            println!("\t{} ({}, {:?}): {}", arg.long_name, arg.short_name, arg.dtype, arg.help);
         }
         println!("\n");
         println!("Optional arguments:");
         for arg in &self.optional_args {
-            println!("\t--{} (-{}, {:?}): {}", arg.long_name, arg.short_name, arg.dtype, arg.help);
+            println!("\t{} ({}, {:?}): {}", arg.long_name, arg.short_name, arg.dtype, arg.help);
         }
     }
 
