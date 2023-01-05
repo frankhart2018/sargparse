@@ -8,7 +8,6 @@ pub enum ArgumentType {
     BOOL,
 }
 
-#[derive(Debug)]
 pub enum InnerData {
     INT(i32),
     FLOAT(f32),
@@ -62,7 +61,6 @@ impl InnerData {
     }
 }
 
-#[derive(Debug)]
 struct Argument {
     short_name: String,
     long_name: String,
@@ -72,7 +70,6 @@ struct Argument {
     dtype: ArgumentType,
 }
 
-#[derive(Debug)]
 pub struct ArgumentParser {
     description: String,
     required_args: Vec<Argument>,
@@ -101,9 +98,9 @@ impl ArgumentParser {
             short_name: short_name.to_string(),
             long_name: long_name.to_string(),
             help: help.to_string(),
-            default: default,
-            required: required,
-            dtype: dtype,
+            default,
+            required,
+            dtype,
         };
 
         if !short_name.starts_with("-") && !long_name.starts_with("--") {
@@ -259,11 +256,11 @@ impl ArgumentParser {
         }
 
         while i < args.len() {
-            if i < args.len() && args[i].starts_with("-") || args[i].starts_with("--") {
+            if args[i].starts_with("-") {
                 let arg_option = args[i].clone();
                 i += 1;
 
-                if i < args.len() && (args[i].starts_with("-") || args[i].starts_with("--")) {
+                if i < args.len() && args[i].starts_with("-") {
                     intermediate_parsed_args.insert(arg_option, "true".to_string());
                     continue;
                 } else if i >= args.len() {
