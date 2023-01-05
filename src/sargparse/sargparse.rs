@@ -101,9 +101,9 @@ impl ArgumentParser {
             short_name: short_name.to_string(),
             long_name: long_name.to_string(),
             help: help.to_string(),
-            default: default,
-            required: required,
-            dtype: dtype,
+            default,
+            required,
+            dtype,
         };
 
         if !short_name.starts_with("-") && !long_name.starts_with("--") {
