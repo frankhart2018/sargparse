@@ -259,7 +259,7 @@ impl ArgumentParser {
         }
 
         while i < args.len() {
-            if i < args.len() && args[i].starts_with("-") || args[i].starts_with("--") {
+            if args[i].starts_with("-") || args[i].starts_with("--") {
                 let arg_option = args[i].clone();
                 i += 1;
 
