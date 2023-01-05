@@ -259,11 +259,11 @@ impl ArgumentParser {
         }
 
         while i < args.len() {
-            if args[i].starts_with("-") || args[i].starts_with("--") {
+            if args[i].starts_with("-") {
                 let arg_option = args[i].clone();
                 i += 1;
 
-                if i < args.len() && (args[i].starts_with("-") || args[i].starts_with("--")) {
+                if i < args.len() && args[i].starts_with("-") {
                     intermediate_parsed_args.insert(arg_option, "true".to_string());
                     continue;
                 } else if i >= args.len() {
