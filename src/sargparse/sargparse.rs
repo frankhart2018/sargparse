@@ -8,7 +8,6 @@ pub enum ArgumentType {
     BOOL,
 }
 
-#[derive(Debug)]
 pub enum InnerData {
     INT(i32),
     FLOAT(f32),
@@ -62,7 +61,6 @@ impl InnerData {
     }
 }
 
-#[derive(Debug)]
 struct Argument {
     short_name: String,
     long_name: String,
@@ -72,7 +70,6 @@ struct Argument {
     dtype: ArgumentType,
 }
 
-#[derive(Debug)]
 pub struct ArgumentParser {
     description: String,
     required_args: Vec<Argument>,
